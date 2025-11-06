@@ -1,0 +1,105 @@
+package com.example.medicalappointmentsystem.model;
+
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "appointments")
+public class Appointment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDate date;
+
+    private LocalTime time;
+
+    private String disease;
+
+    private String remarks;
+
+    // optionally link to patient
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private User patient;
+
+    // (optional) later you can add doctor
+    // @ManyToOne
+    // private User doctor;
+
+    // --- Constructors ---
+    public Appointment() {
+    }
+
+    public Appointment(LocalDate date, LocalTime time, String disease, String remarks, User patient) {
+        this.date = date;
+        this.time = time;
+        this.disease = disease;
+        this.remarks = remarks;
+        this.patient = patient;
+    }
+
+    // --- Getters & Setters ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public LocalTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
+
+    public String getDisease() {
+        return disease;
+    }
+
+    public void setDisease(String disease) {
+        this.disease = disease;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public User getPatient() {
+        return patient;
+    }
+
+    public void setPatient(User patient) {
+        this.patient = patient;
+    }
+
+    // --- toString ---
+    @Override
+    public String toString() {
+        return "Appointment{" +
+                "id=" + id +
+                ", date=" + date +
+                ", time=" + time +
+                ", disease='" + disease + '\'' +
+                ", remarks='" + remarks + '\'' +
+                ", patient=" + (patient != null ? patient.getId() : null) +
+                '}';
+    }
+}

@@ -1,0 +1,63 @@
+package com.example.medicalappointmentsystem.controller;
+
+import com.example.medicalappointmentsystem.model.User;
+import com.example.medicalappointmentsystem.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email already in use"));
+        }
+
+        // Save user (make sure password is encoded!)
+        User savedUser = userRepository.save(user);
+
+        // Build response (same as login)
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", savedUser.getUsername());
+        response.put("email", savedUser.getEmail());
+        response.put("role", savedUser.getRole());
+        response.put("message", "User registered successfully!");
+
+        return ResponseEntity.ok(response);
+    }
+
+
+ // ✅ Login API
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
+        return userRepository.findByEmail(loginRequest.getEmail())
+                .map(user -> {
+                    if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                        // return JSON instead of plain text
+                        return ResponseEntity.ok(Map.of(
+                                "message", "Login successful!",
+                                "username", user.getUsername(),
+                                "email", user.getEmail(),
+                                "role", user.getRole()
+                        ));
+                    } else {
+                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid password!"));
+                    }
+                })
+                .orElse(ResponseEntity.badRequest().body(Map.of("error", "User not found!")));
+    }
+
+}

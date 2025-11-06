@@ -1,0 +1,5 @@
+package com.example.medicalappointmentsystem.repository;
+
+public class AppointmentRepository {
+
+}

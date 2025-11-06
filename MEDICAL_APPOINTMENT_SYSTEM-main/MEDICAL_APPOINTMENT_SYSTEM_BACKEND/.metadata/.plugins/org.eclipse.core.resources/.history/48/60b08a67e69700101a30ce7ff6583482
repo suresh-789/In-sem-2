@@ -1,0 +1,25 @@
+@RestController
+@RequestMapping
+public class UserController {
+
+    private final UserRepository userRepository;
+
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // ✅ Existing
+    @GetMapping("/users")
+    public List<User> getUsersByRole(@RequestParam(required = false) String role) {
+        if (role != null) {
+            return userRepository.findByRole(role);
+        }
+        return userRepository.findAll();
+    }
+
+    // ✅ New: dedicated doctors endpoint
+    @GetMapping("/doctors")
+    public List<User> getDoctors() {
+        return userRepository.findByRole("DOCTOR");
+    }
+}

@@ -1,0 +1,5 @@
+package com.example.medicalappointmentsystem.model;
+
+public class Appointment {
+
+}

@@ -1,0 +1,44 @@
+package com.example.medicalappointmentsystem.controller;
+
+import com.example.medicalappointmentsystem.model.User;
+import com.example.medicalappointmentsystem.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // ✅ Register API
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email already exists!");
+        }
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Username already exists!");
+        }
+
+        // 🚨 later we will encrypt password with Spring Security
+        userRepository.save(user);
+        return ResponseEntity.ok("User registered successfully!");
+    }
+
+    // ✅ Login API
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
+        return userRepository.findByEmail(loginRequest.getEmail())
+                .map(user -> {
+                    if (user.getPassword().equals(loginRequest.getPassword())) {
+                        return ResponseEntity.ok("Login successful!");
+                    } else {
+                        return ResponseEntity.badRequest().body("Invalid password!");
+                    }
+                })
+                .orElse(ResponseEntity.badRequest().body("User not found!"));
+    }
+}

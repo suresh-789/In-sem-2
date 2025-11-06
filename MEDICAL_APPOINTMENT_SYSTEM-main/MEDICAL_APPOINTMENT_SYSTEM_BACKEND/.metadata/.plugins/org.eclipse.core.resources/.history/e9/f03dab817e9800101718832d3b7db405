@@ -1,0 +1,5 @@
+package com.example.medicalappointmentsystem.dto;
+
+public class UserDTO {
+
+}

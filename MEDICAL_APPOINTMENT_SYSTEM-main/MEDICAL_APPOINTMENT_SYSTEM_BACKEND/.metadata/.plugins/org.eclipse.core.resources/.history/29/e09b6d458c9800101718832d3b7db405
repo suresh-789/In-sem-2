@@ -1,0 +1,10 @@
+// src/main/java/com/example/medicalappointmentsystem/repository/MedicalRecordRepository.java
+package com.example.medicalappointmentsystem.repository;
+
+import com.example.medicalappointmentsystem.model.MedicalRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Long> {
+}

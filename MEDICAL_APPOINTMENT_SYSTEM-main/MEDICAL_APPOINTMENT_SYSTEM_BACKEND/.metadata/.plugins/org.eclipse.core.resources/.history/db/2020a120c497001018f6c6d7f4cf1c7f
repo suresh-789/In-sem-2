@@ -1,0 +1,5 @@
+package com.example.medicalappointmentsystem.config;
+
+public class WebConfig {
+
+}

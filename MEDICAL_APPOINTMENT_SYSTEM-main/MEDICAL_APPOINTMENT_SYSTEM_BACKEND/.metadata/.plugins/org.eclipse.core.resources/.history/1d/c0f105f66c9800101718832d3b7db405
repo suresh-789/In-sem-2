@@ -1,0 +1,34 @@
+package com.example.medicalappointmentsystem.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Entity
+@Getter
+@Setter
+public class Appointment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDate date;
+
+    private LocalTime time;
+
+    private String disease;
+
+    private String remarks;
+
+    // optionally link to patient
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private User patient;
+
+    // (optional) later you can add doctor
+    // @ManyToOne
+    // private User doctor;
+}

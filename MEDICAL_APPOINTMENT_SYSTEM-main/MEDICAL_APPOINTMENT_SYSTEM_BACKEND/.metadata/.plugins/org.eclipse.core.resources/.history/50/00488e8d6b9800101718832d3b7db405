@@ -1,0 +1,47 @@
+package com.example.medicalappointmentsystem.controller;
+
+import com.example.medicalappointmentsystem.model.User;
+import com.example.medicalappointmentsystem.repository.UserRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:5173") // allow frontend
+public class UserController {
+
+    private final UserRepository userRepository;
+
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    // Get all users or filter by role
+    @GetMapping
+    public List<User> getUsersByRole(@RequestParam(required = false) String role) {
+        if (role != null) {
+            try {
+                // Convert string to enum safely
+                User.Role roleEnum = User.Role.valueOf(role.toUpperCase());
+                return userRepository.findByRole(roleEnum);
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid role: " + role);
+            }
+        }
+        return userRepository.findAll();
+    }
+
+    // Get a single user by ID
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+    }
+
+    // Delete a user
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+    }
+}

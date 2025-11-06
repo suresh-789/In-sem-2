@@ -1,0 +1,5 @@
+package com.example.medicalappointmentsystem.controller;
+
+public class DoctorController {
+
+}

@@ -1,0 +1,89 @@
+---
+- name: Deploy E-Commerce Fullstack App on Local Kubernetes (WSL + Minikube)
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+
+  vars:
+    k8s_manifest_path: "../k8s/fullstack-deployment.yaml"   
+    frontend_nodeport: 30082
+    backend_nodeport: 30083
+    namespace: ecommerce
+
+  tasks:
+
+    - name: Gather system facts
+      ansible.builtin.setup:
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Start Minikube (if not running)
+      shell: |
+        if ! minikube status 2>/dev/null | grep -q "Running"; then
+          echo " Starting Minikube using Docker driver..."
+          minikube start --driver=docker --memory=4000 --cpus=2
+        else
+          echo " Minikube already running."
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Ensure Kubernetes namespace exists
+      shell: kubectl get ns {{ namespace }} || kubectl create ns {{ namespace }}
+      args:
+        executable: /bin/bash
+
+    - name: Copy Kubernetes deployment file
+      ansible.builtin.copy:
+        src: "{{ k8s_manifest_path }}"
+        dest: /tmp/fullstack-deployment.yaml
+        force: yes
+
+    - name: Apply Kubernetes manifests (MySQL, Backend, Frontend)
+      shell: kubectl apply -f /tmp/fullstack-deployment.yaml -n {{ namespace }}
+      args:
+        executable: /bin/bash
+
+    - name: Wait for all pods to reach Running state
+      shell: |
+        kubectl get pods -n {{ namespace }} --no-headers | grep -v Running || true
+      register: pod_status
+      until: pod_status.stdout == ""
+      retries: 25
+      delay: 10
+      args:
+        executable: /bin/bash
+
+    - name: Display all services
+      shell: kubectl get svc -n {{ namespace }}
+      register: svc_output
+      args:
+        executable: /bin/bash
+
+    - name: Print services table
+      ansible.builtin.debug:
+        msg: "{{ svc_output.stdout }}"
+
+  
+    - name: Forward backend service port 30083 -> 8081 (background)
+      shell: |
+        nohup kubectl port-forward -n {{ namespace }} svc/backend {{ backend_nodeport }}:8081 >/dev/null 2>&1 &
+      args:
+        executable: /bin/bash
+
+    - name: Forward frontend service port 30082 -> 80 (background)
+      shell: |
+        nohup kubectl port-forward -n {{ namespace }} svc/frontend {{ frontend_nodeport }}:80 >/dev/null 2>&1 &
+      args:
+        executable: /bin/bash
+
+    - name: Show application access URLs
+      ansible.builtin.debug:
+        msg:
+          - " Frontend URL: http://localhost:{{ frontend_nodeport }}"
+          - " Backend URL:  http://localhost:{{ backend_nodeport }}"
+          - " MySQL: Internal ClusterIP (access from backend pod) → mysql:3306"

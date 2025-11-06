@@ -1,0 +1,63 @@
+// src/main/java/com/example/medicalappointmentsystem/model/MedicalRecord.java
+package com.example.medicalappointmentsystem.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "medical_records")
+public class MedicalRecord {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String patientName;
+
+    private String phoneNumber;
+
+    private String disease;
+
+    private String treatment;
+
+    private String remarks;
+
+    // ✅ Constructors
+    public MedicalRecord() {}
+
+    public MedicalRecord(String patientName, String phoneNumber, String disease, String treatment, String remarks) {
+        this.patientName = patientName;
+        this.phoneNumber = phoneNumber;
+        this.disease = disease;
+        this.treatment = treatment;
+        this.remarks = remarks;
+    }
+
+    // ✅ Getters & Setters
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+
+    public String getPatientName() { return patientName; }
+
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public String getDisease() { return disease; }
+
+    public void setDisease(String disease) { this.disease = disease; }
+
+    public String getTreatment() { return treatment; }
+
+    public void setTreatment(String treatment) { this.treatment = treatment; }
+
+    public String getRemarks() { return remarks; }
+
+    public void setRemarks(String remarks) { this.remarks = remarks; }
+}

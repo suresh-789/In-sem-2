@@ -1,0 +1,36 @@
+package com.example.medicalappointmentsystem.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // ✅ Disable CSRF for API usage
+            .csrf(csrf -> csrf.disable())
+            // ✅ Enable CORS (your WebConfig handles origins)
+            .cors(cors -> {})
+            // ✅ Authorization rules
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**").permitAll()            // login/register
+                .requestMatchers("/api/users/**").permitAll()       // users
+                .requestMatchers("/api/appointments/**").permitAll()// appointments
+                .requestMatchers("/api/records/**").permitAll()     // ✅ medical records
+                .anyRequest().authenticated()                       // everything else requires login
+            );
+
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}

@@ -1,0 +1,38 @@
+package com.example.medicalappointmentsystem.controller;
+
+import com.example.medicalappointmentsystem.model.Appointment;
+import com.example.medicalappointmentsystem.*;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/appointments")
+@CrossOrigin(origins = "http://localhost:5173") // allow frontend
+public class AppointmentController {
+
+    private final AppointmentRepository appointmentRepository;
+
+    public AppointmentController(AppointmentRepository appointmentRepository) {
+        this.appointmentRepository = appointmentRepository;
+    }
+
+    // Create new appointment
+    @PostMapping
+    public Appointment createAppointment(@RequestBody Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+    // List all appointments
+    @GetMapping
+    public List<Appointment> getAppointments() {
+        return appointmentRepository.findAll();
+    }
+
+    // Get single appointment
+    @GetMapping("/{id}")
+    public Appointment getAppointment(@PathVariable Long id) {
+        return appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found with id " + id));
+    }
+}

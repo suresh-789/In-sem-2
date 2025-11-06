@@ -1,0 +1,17 @@
+package com.example.medicalappointmentsystem.repository;
+
+import com.example.medicalappointmentsystem.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository  // 👈 this is important
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findByUsername(String username);
+    List<User> findByRole(String role);
+    List<User> findByRole(User.Role role);
+
+}

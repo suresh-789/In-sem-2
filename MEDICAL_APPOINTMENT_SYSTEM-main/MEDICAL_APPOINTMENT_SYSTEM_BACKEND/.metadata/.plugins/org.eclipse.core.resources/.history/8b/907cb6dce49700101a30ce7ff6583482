@@ -1,0 +1,18 @@
+package com.example.medicalappointmentsystem.controller;
+
+//UserController.java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+ @Autowired
+ private UserRepository userRepository;
+
+ @GetMapping
+ public List<User> getUsers(@RequestParam(required = false) String role) {
+     if (role != null) {
+         return userRepository.findByRole(role);
+     }
+     return userRepository.findAll();
+ }
+}
